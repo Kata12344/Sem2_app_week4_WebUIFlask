@@ -1,0 +1,155 @@
+openapi: "3.0.0"
+info:
+  title: Travel Booking API
+  version: 1.0.0
+  description: API for booking and managing travel holidays.
+
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    Holiday:
+      type: "object"
+      required:
+        - ID
+      properties:
+        ID:
+          type: "string"
+        location:
+          type: "string"
+        pricePP:
+          type: "integer"
+        availableDate:
+          type: "string"
+          format: "date"
+    Booking:
+      type: "object"
+      required:
+        - booking_id
+        - holiday_id
+      properties:
+        booking_id:
+          type: "string"
+        holiday_id:
+          type: "string"
+        transportation:
+          type: "string"
+        num_people:
+          type: "integer"
+        customer_name:
+          type: "string"
+  parameters:
+    booking_id:
+      name: "booking_id"
+      description: "Booking id of the booking to get"
+      in: path
+      required: True
+      schema:
+        type: "string"
+
+paths:
+  /holidays:
+    get:
+      operationId: "holidays.read_all"
+      tags:
+        - Holidays
+      summary: Retrieve a list of available holidays.
+      description: Returns all available holiday packages.
+      responses:
+        "200":
+          description: A list of available holidays.
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Something went wrong on the server."
+    post: 
+      operationId: "holidays.create"
+      tags:
+        - Holidays
+      summary: "Create new holiday"
+      requestBody:
+        description: "Holiday to create"
+        required: True
+        content:
+          application/json:
+            schema:
+              x-body-name: "holiday"
+              $ref: "#/components/schemas/Holiday"
+      responses:
+        "201":
+          description: "Sucessfully created a holiday"
+
+  /mybookings:
+    get:
+      operationId: "bookings.read_all"
+      tags:
+        - Bookings
+      summary: Retrieve a list of all bookings.
+      description: Ret a list of all bookings made by users, including details like holiday ID, transportation, number of people, travel date and customer name.
+      responses:
+        "200":
+          description: A list of all bookings.
+ 
+    post: 
+      operationId: "bookings.create"
+      tags: 
+        - Bookings
+      summary: "Create a new booking."
+      requestBody:
+        description: "Booking to create"
+        required: True
+        content:
+          application/json:
+            schema:
+              x-body-name: "booking"
+              $ref: "#/components/schemas/Booking"
+      responses:
+        "201":
+          description: "Sucessfully created a new booking"
+
+
+  /mybookings/{booking_id}:
+    get:
+      operationId: "bookings.read_one"
+      tags:
+        - Bookings
+      summary: "Read one booking"
+      parameters:
+        - $ref: "#/components/parameters/booking_id"
+      responses:
+        "200":
+          description: "Sucessfully read one booking"
+    put:
+      tags:
+        - Bookings
+      operationId: "bookings.update"
+      summary: "Update a booking"
+      parameters:
+        - $ref: "#/components/parameters/booking_id"
+      responses:
+        "200":
+          description: "Sucessfully updated one booking"
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              x-body-name: "booking"
+              $ref: "#/components/schemas/Booking"
+    delete:
+      tags:
+        - Bookings
+      operationId: "bookings.delete"
+      summary: "Delete one booking"
+      parameters:
+        - $ref: "#/components/parameters/booking_id"
+      responses:
+        "204":
+          description: "Sucessfully deleted"
+
